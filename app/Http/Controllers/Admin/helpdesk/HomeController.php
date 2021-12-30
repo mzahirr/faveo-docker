@@ -31,6 +31,7 @@ class HomeController extends Controller
      */
     public function index()
     {
+        dd('test');
         return view('themes/default1/admin/dashboard');
     }
 }
