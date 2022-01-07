@@ -1,5 +1,23 @@
 version: '2.0'
 services:
+  mysql:
+    image: mysql:5.7.32
+    platform: linux/x86_64
+    container_name: mysql
+    restart: always
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: faveo
+      MYSQL_DATABASE: faveo
+      MYSQL_USER: faveo
+      MYSQL_PASSWORD: faveo
+      volumes:
+        -dbdata:/var/lib/mysql/
+        -./mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - app-network
   app:
     build:
       context: .
@@ -16,6 +34,8 @@ services:
       - ./php/laravel.ini:/usr/local/etc/php/conf.d/laravel.ini
     networks:
       - app-network
+    depends_on:
+      - mysql
   webserver:
     image: nginx:alpine
     container_name: webserver
@@ -27,23 +47,6 @@ services:
     volumes:
       - ./:/var/www/html/
       - ./nginx/conf.d/:/etc/nginx/conf.d/
-    networks:
-      - app-network
-  mysql:
-    image: mysql:5.7.32
-    container_name: mysql
-    restart: always
-    tty: true
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: faveo
-      MYSQL_DATABASE: faveo
-      MYSQL_USER: faveo
-      MYSQL_PASSWORD: faveo
-      volumes:
-        -dbdata:/var/lib/mysql/
-        -./mysql/my.cnf:/etc/mysql/my.cnf
     networks:
       - app-network
 

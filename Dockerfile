@@ -22,11 +22,15 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install extensions for php
-RUN docker-php-ext-install pdo_mysql mbstring openssl imap  zip exif pcntl && docker-php-ext-configure gd \
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl && docker-php-ext-configure gd \
                                                                  && docker-php-ext-install -j$(nproc) gd \
                                                                  && docker-php-ext-install pdo_mysql \
                                                                  && docker-php-ext-install mysqli \
                                                                  && docker-php-ext-install zip \
+
+RUN docker-php-ext-install mbstring imap openssl \
+
+RUN docker-php-ext-configure imap
 
 
 # Install composer (php package manager)
@@ -39,10 +43,6 @@ COPY . /var/www/html
 RUN chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/bootstrap/cache
-
-RUN php artisan migrate
-RUN php artisan db:seed --force
-RUN php artisan jwt:secret
 
 # Expose port 9000 and start php-fpm server (for FastCGI Process Manager)
 EXPOSE 9000
